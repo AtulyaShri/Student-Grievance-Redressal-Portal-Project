@@ -8,3 +8,6 @@ python-multipart
 pytest
 pytest-asyncio
 httpx
+bcrypt
+alembic
+psycopg2-binary

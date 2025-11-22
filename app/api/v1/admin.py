@@ -1,24 +1,24 @@
 from fastapi import APIRouter, Depends, HTTPException
 from typing import List
+from sqlalchemy.orm import Session
 
 from app.schemas.grievance import GrievanceRead
-from app.api.dependencies import get_current_user
+from app.api.deps import get_current_user, admin_required
+from app.db.session import get_db
+from app.models.grievance import Grievance
 
 router = APIRouter()
 
-# For demo we rely on student module's in-memory store
-from app.api.v1 import student as student_module
-
 
 @router.get("/grievances", response_model=List[GrievanceRead])
-def list_grievances(user=Depends(get_current_user)):
+def list_grievances(user=Depends(get_current_user), db: Session = Depends(get_db)):
     # TODO: enforce admin role
-    return list(student_module._db.values())
+    return db.query(Grievance).all()
 
 
 @router.get("/grievances/{grievance_id}", response_model=GrievanceRead)
-def get_grievance(grievance_id: int, user=Depends(get_current_user)):
-    g = student_module._db.get(grievance_id)
+def get_grievance(grievance_id: int, user=Depends(get_current_user), db: Session = Depends(get_db)):
+    g = db.query(Grievance).filter(Grievance.id == grievance_id).first()
     if not g:
         raise HTTPException(status_code=404, detail="Not found")
     return g

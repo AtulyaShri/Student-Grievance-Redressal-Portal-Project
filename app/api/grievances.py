@@ -1,7 +1,7 @@
 from fastapi import APIRouter, BackgroundTasks, HTTPException, status, Depends
 from pydantic import BaseModel
-from app.api.dependencies import get_current_user
-from app.core.notifications import (
+from app.api.deps import get_current_user
+from app.services.notifications import (
     notify_grievance_created,
     notify_grievance_status_changed,
     notify_grievance_assigned,

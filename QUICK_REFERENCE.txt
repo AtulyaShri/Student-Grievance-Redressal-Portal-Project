@@ -1,0 +1,141 @@
+================================================================================
+QUICK REFERENCE CARD
+================================================================================
+
+🚀 START THE APP (3 commands)
+─────────────────────────────────────────────────────────────────────────────
+$env:DATABASE_URL = "sqlite:///dev.db"
+python scripts/seed_data.py
+python run.py
+
+Then open: http://localhost:8000/docs
+
+🔑 TEST LOGIN CREDENTIALS (pre-seeded)
+─────────────────────────────────────────────────────────────────────────────
+Admin:   admin@example.com / admin123
+Student: student@example.com / password123
+
+📝 KEY FILES TO EDIT
+─────────────────────────────────────────────────────────────────────────────
+app/main.py                  - FastAPI app config
+app/api/v1/auth.py           - Login/register logic
+app/api/v1/student.py        - Grievance creation
+app/api/v1/admin.py          - Admin endpoints
+app/models/                  - Database models
+app/core/security.py         - Password & JWT logic
+requirements.txt             - Dependencies
+
+📍 API ENDPOINTS SUMMARY
+─────────────────────────────────────────────────────────────────────────────
+POST   /api/v1/auth/register              Register user
+POST   /api/v1/auth/login                 Get JWT token
+POST   /api/v1/grievances/                Create grievance
+GET    /api/v1/grievances/{id}            View grievance
+GET    /api/v1/admin/grievances           List all grievances
+GET    /api/v1/admin/grievances/{id}      View grievance (admin)
+GET    /                                   Health check
+GET    /health                             Health status
+
+💾 DATABASE COMMANDS
+─────────────────────────────────────────────────────────────────────────────
+Create tables:           python scripts/create_db.py
+Seed test data:          python scripts/seed_data.py
+Reset database:          del dev.db && python scripts/create_db.py
+View tables (SQLite):    sqlite3 dev.db ".tables"
+Query users (SQLite):    sqlite3 dev.db "SELECT * FROM users;"
+Generate migration:      python -m alembic revision --autogenerate -m "msg"
+Apply migration:         python -m alembic upgrade head
+Rollback migration:      python -m alembic downgrade -1
+
+🧪 TESTING
+─────────────────────────────────────────────────────────────────────────────
+Run all tests:           python -m pytest -v
+Run test file:           python -m pytest tests/test_auth.py -v
+Run with coverage:       python -m pytest --cov=app
+Stop on first failure:   python -m pytest -x
+
+🐳 DOCKER
+─────────────────────────────────────────────────────────────────────────────
+Build dev image:         docker build -t portal:dev .
+Build prod image:        docker build -f Dockerfile.prod -t portal:prod .
+Run dev container:       docker run -p 8000:80 portal:dev
+Run with compose:        docker compose up -d
+Stop compose:            docker compose down
+View logs:               docker compose logs -f web
+
+🔧 ENVIRONMENT VARIABLES
+─────────────────────────────────────────────────────────────────────────────
+DATABASE_URL             sqlite:///dev.db
+SECRET_KEY               your-secret-key
+ALGORITHM                HS256
+ACCESS_TOKEN_EXPIRE_MIN  60
+SMTP_HOST                smtp.gmail.com
+SMTP_PORT                587
+SMTP_USER                your-email@gmail.com
+SMTP_PASSWORD            app-password
+FROM_EMAIL               noreply@example.com
+DEBUG                    0 (or 1)
+
+📚 DOCUMENTATION FILES
+─────────────────────────────────────────────────────────────────────────────
+README.md                - Full overview & features
+QUICKSTART.txt           - 5-minute setup
+SETUP.txt                - Copy-paste commands
+PROJECT_STATUS.txt       - Completion checklist
+README_DEPLOYMENT.md     - Production deployment
+.env.example             - Dev env variables
+.env.production.example  - Prod env variables
+
+🌐 URLS
+─────────────────────────────────────────────────────────────────────────────
+API Health:              http://localhost:8000/
+API Docs (Swagger):      http://localhost:8000/docs
+API Docs (ReDoc):        http://localhost:8000/redoc
+GitHub Repo:             https://github.com/AtulyaShri/Student-Grievance-Redressal-Portal-Project
+
+⚠️  COMMON ISSUES & FIXES
+─────────────────────────────────────────────────────────────────────────────
+Port 8000 in use:        python -m uvicorn app.main:app --port 8001
+ModuleNotFoundError:     pip install -r requirements.txt
+No such table:           python scripts/create_db.py
+bcrypt fails on Windows: pip install bcrypt --only-binary :all:
+Can't import app:        Check DATABASE_URL is set & in project dir
+Token expired:           Login again (default 60 min expiry)
+
+💡 TIPS
+─────────────────────────────────────────────────────────────────────────────
+• Use http://localhost:8000/docs to test endpoints interactively
+• Always set $env:DATABASE_URL before running app
+• Use pytest -v -s to see print() statements during tests
+• Check migrations/versions/ after autogenerate to review schema changes
+• Use Admin account to test admin endpoints
+• Student account can only see own grievances
+• Leave SMTP unconfigured for dev (emails won't send but app works)
+
+📋 WORKFLOW
+─────────────────────────────────────────────────────────────────────────────
+1. Change a model → python -m alembic revision --autogenerate -m "description"
+2. Review migration in migrations/versions/
+3. Apply migration → python -m alembic upgrade head
+4. Test endpoints → http://localhost:8000/docs
+5. Run tests → python -m pytest -v
+6. Deploy → docker compose up -d or docker push
+
+================================================================================
+PROJECT COMPLETE - READY TO USE 🎉
+================================================================================
+
+Everything is set up and ready to run. Start with:
+
+  python run.py
+
+Then go to http://localhost:8000/docs
+
+Use admin@example.com / admin123 to log in.
+
+For full details, see README.md and documentation files.
+
+Questions? Check GitHub: 
+https://github.com/AtulyaShri/Student-Grievance-Redressal-Portal-Project
+
+================================================================================

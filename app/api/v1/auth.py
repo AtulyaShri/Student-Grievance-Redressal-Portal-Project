@@ -1,8 +1,11 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 from pydantic import BaseModel
-from typing import Dict
+from sqlalchemy.orm import Session
 
 from app.core import security
+from app.db.session import get_db
+from app.models.user import User
+from app.api.deps import get_current_user
 
 router = APIRouter()
 
@@ -17,23 +20,23 @@ class TokenResponse(BaseModel):
     token_type: str = "bearer"
 
 
-# Simple in-memory store for demo purposes. Replace with DB in production.
-_users: Dict[str, Dict] = {}
-
-
 @router.post("/register", status_code=201)
-def register(req: RegisterRequest):
-    if req.email in _users:
+def register(req: RegisterRequest, db: Session = Depends(get_db)):
+    existing = db.query(User).filter(User.email == req.email).first()
+    if existing:
         raise HTTPException(status_code=400, detail="User already exists")
     hashed = security.get_password_hash(req.password)
-    _users[req.email] = {"email": req.email, "hashed": hashed}
+    user = User(email=req.email, hashed_password=hashed)
+    db.add(user)
+    db.commit()
+    db.refresh(user)
     return {"msg": "registered"}
 
 
 @router.post("/login", response_model=TokenResponse)
-def login(req: RegisterRequest):
-    user = _users.get(req.email)
-    if not user or not security.verify_password(req.password, user["hashed"]):
+def login(req: RegisterRequest, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == req.email).first()
+    if not user or not security.verify_password(req.password, user.hashed_password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
-    token = security.create_access_token(subject=req.email)
+    token = security.create_access_token(subject=user.email)
     return {"access_token": token}

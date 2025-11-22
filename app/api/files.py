@@ -1,7 +1,7 @@
 from fastapi import APIRouter, UploadFile, File, Depends, HTTPException, status
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
-from app.api.dependencies import get_current_user
+from app.api.deps import get_current_user
 from app.core.storage import save_upload, delete_file, MEDIA_ROOT
 from pathlib import Path
 

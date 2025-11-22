@@ -1,0 +1,198 @@
+================================================================================
+PORTAL SETUP - COPY & PASTE COMMANDS FOR WINDOWS POWERSHELL
+================================================================================
+
+STEP 1: Open PowerShell and go to project
+================================================================================
+cd "f:/student portal/grievance_portal"
+
+STEP 2: Create & activate virtual environment (first time only)
+================================================================================
+python -m venv .venv
+& ".venv/Scripts/Activate.ps1"
+
+STEP 3: Install dependencies
+================================================================================
+pip install --upgrade pip
+pip install -r requirements.txt
+
+Note: If bcrypt fails, run:
+pip install bcrypt --only-binary :all:
+
+STEP 4: Set database environment variable
+================================================================================
+For SQLite (quickest for dev):
+$env:DATABASE_URL = "sqlite:///dev.db"
+
+OR for PostgreSQL (production):
+$env:DATABASE_URL = "postgresql://user:password@localhost:5432/grievance_db"
+pip install psycopg2-binary
+
+STEP 5: Create database tables (choose ONE)
+================================================================================
+Option A - Fastest (tables created on first app start):
+(just skip this, tables auto-create in step 6)
+
+Option B - Manual SQLAlchemy:
+python scripts/create_db.py
+
+Option C - Using Alembic (migration-based):
+python -m alembic upgrade head
+
+STEP 6: Seed test data (optional but recommended)
+================================================================================
+python scripts/seed_data.py
+
+This creates:
+  - Admin user: admin@example.com / admin123
+  - Test student: student@example.com / password123
+  - Sample departments
+
+STEP 7: RUN THE APP!
+================================================================================
+python run.py
+
+You'll see:
+  INFO:     Uvicorn running on http://127.0.0.1:8000
+  INFO:     Application startup complete
+
+STEP 8: Open in browser
+================================================================================
+http://localhost:8000/docs
+
+This opens the interactive Swagger UI where you can:
+- Test all endpoints
+- See auto-generated API documentation
+- Try "Try it out" on any endpoint
+
+================================================================================
+QUICK API TEST
+================================================================================
+
+In the Swagger UI:
+
+1. REGISTER:
+   - Click: POST /api/v1/auth/register
+   - "Try it out"
+   - Body: {"email": "student@example.com", "password": "password123"}
+   - Execute
+
+2. LOGIN:
+   - Click: POST /api/v1/auth/login
+   - "Try it out"
+   - Same email/password
+   - Copy the "access_token"
+
+3. AUTHORIZE:
+   - Click the 🔒 icon (top right)
+   - Paste: Bearer YOUR_TOKEN
+   - Click "Authorize"
+
+4. CREATE GRIEVANCE:
+   - Click: POST /api/v1/grievances/
+   - "Try it out"
+   - Body:
+     {
+       "title": "Complaint Title",
+       "description": "Detailed description",
+       "category": "Academic",
+       "dept_id": null
+     }
+   - Execute
+
+5. VIEW ALL (Admin):
+   - Click: GET /api/v1/admin/grievances
+   - Execute
+
+================================================================================
+ADDITIONAL COMMANDS
+================================================================================
+
+Stop the app:
+CTRL + C
+
+Run tests:
+python -m pytest -v
+
+View test coverage:
+python -m pytest --cov=app
+
+Run specific test:
+python -m pytest tests/test_auth.py -v
+
+View SQLite database (if using SQLite):
+sqlite3 dev.db
+  > .tables          (show tables)
+  > SELECT * FROM users;
+  > .quit
+
+Reset database (remove all data):
+del dev.db
+python scripts/create_db.py
+python scripts/seed_data.py
+
+Change port (if 8000 is busy):
+python -m uvicorn app.main:app --port 8001
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+Q: "ModuleNotFoundError: No module named 'X'"
+A: pip install -r requirements.txt
+
+Q: "OSError: [Errno 10048] Only one usage of each socket address"
+A: Port 8000 is in use. Use a different port:
+   python -m uvicorn app.main:app --port 8001
+
+Q: "error: Microsoft Visual C++ 14.0 or greater is required"
+A: Install Build Tools or use:
+   pip install bcrypt --only-binary :all:
+
+Q: "FATAL: role 'user' does not exist"
+A: You're trying to use PostgreSQL but user doesn't exist. Either:
+   - Create the user in your DB
+   - Use SQLite instead: $env:DATABASE_URL = "sqlite:///dev.db"
+
+Q: "sqlite3.OperationalError: no such table: users"
+A: Run: python scripts/create_db.py
+
+================================================================================
+NEXT STEPS AFTER RUNNING
+================================================================================
+
+1. ✓ Play with the API in Swagger UI
+2. ✓ Create a few test grievances
+3. ✓ Check database:
+     sqlite3 dev.db "SELECT * FROM grievances;"
+
+4. Run tests to verify everything works:
+     python -m pytest tests/ -v
+
+5. For production deployment:
+     - See README_DEPLOYMENT.md
+     - Or: docker compose up -d (requires .env.production file)
+
+6. To push to GitHub:
+     git add .
+     git commit -m "Initial commit"
+     git push origin main
+
+================================================================================
+THAT'S IT! 🎉
+================================================================================
+
+Your portal is ready. The app is running, the database is set up,
+and you can start creating and managing grievances.
+
+For full documentation, see:
+  - README.md
+  - QUICKSTART.txt
+  - README_DEPLOYMENT.md
+  - http://localhost:8000/docs (API docs)
+
+Questions? Check the GitHub repo or your project documentation.
+
+Happy grievance management! 🚀
+
+================================================================================
