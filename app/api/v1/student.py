@@ -31,3 +31,8 @@ def read_grievance(grievance_id: int, user=Depends(get_current_user), db: Sessio
     if not g:
         raise HTTPException(status_code=404, detail="Not found")
     return g
+
+
+@router.get("/health", response_model=dict)
+def health_check():
+    return {"status": "healthy"}
