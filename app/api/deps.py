@@ -15,12 +15,26 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     """Validate JWT token and return current User from database."""
     try:
         payload = security.decode_token(token)
-        email = payload.get("sub")
-        if not email:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
-        user = db.query(UserModel).filter(UserModel.email == email).first()
+        # Prefer explicit 'email' claim; handle 'sub' which may be either an id or an email
+        email = payload.get("email")
+        user = None
+        if email:
+            user = db.query(UserModel).filter(UserModel.email == email).first()
+        else:
+            sub = payload.get("sub")
+            if sub:
+                # if sub looks like an email, treat it as email
+                if isinstance(sub, str) and "@" in sub:
+                    user = db.query(UserModel).filter(UserModel.email == sub).first()
+                else:
+                    try:
+                        user = db.query(UserModel).filter(UserModel.id == int(sub)).first()
+                    except Exception:
+                        user = None
+
         if not user:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
+
         return user
     except JWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")

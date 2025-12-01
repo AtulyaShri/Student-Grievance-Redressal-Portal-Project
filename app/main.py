@@ -12,7 +12,8 @@ app = FastAPI(title="Student Grievance Portal API", version="1.0")
 # Enable CORS for frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:5173"],  # Vite default ports
+   allow_origins=["*"],
+# Vite default ports
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

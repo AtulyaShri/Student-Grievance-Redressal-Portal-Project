@@ -16,7 +16,7 @@ export default function Header() {
       <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-full bg-sky-600 flex items-center justify-center text-white font-bold">
-            GP
+            
           </div>
           <div>
             <div className="text-lg font-bold">Student Grievance Portal</div>

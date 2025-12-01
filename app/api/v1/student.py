@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+from typing import List
 from sqlalchemy.orm import Session
 
 from app.schemas.grievance import GrievanceCreate, GrievanceRead
@@ -36,3 +37,10 @@ def read_grievance(grievance_id: int, user=Depends(get_current_user), db: Sessio
 @router.get("/health", response_model=dict)
 def health_check():
     return {"status": "healthy"}
+
+
+@router.get("/", response_model=List[GrievanceRead])
+def list_grievances(user=Depends(get_current_user), db: Session = Depends(get_db)):
+    """List grievances for the current user."""
+    grievances = db.query(Grievance).filter(Grievance.student_id == user.id).all()
+    return grievances
